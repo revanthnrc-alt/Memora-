@@ -1,0 +1,285 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-deep: #12101A;
+  --bg-mid: #1E1A2A;
+  --card-glass: rgba(30, 26, 42, 0.75);
+  --card-border: rgba(255, 255, 255, 0.08);
+  
+  --sunset-rose: #C98B8B;
+  --sunset-lavender: #A495B8;
+  --sunset-peach: #D4A878;
+  --sunset-plum: #8A7A9A;
+  --sunset-amber: #B8A078;
+  
+  --text-primary: #FFFFFF;
+  --text-secondary: #B8B0C4;
+  --text-muted: #6A6280;
+  
+  --sos-coral: #D45A5A;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%;
+  background-color: var(--bg-deep);
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+/* Ambient gradient background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(ellipse 100% 70% at 50% -20%, rgba(180, 130, 130, 0.12), transparent 60%),
+    radial-gradient(ellipse 80% 50% at 80% 80%, rgba(160, 140, 180, 0.1), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 10% 90%, rgba(200, 160, 120, 0.08), transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+  animation: ambientShift 12s ease-in-out infinite;
+}
+
+/* Grain texture overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Animations */
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: #D45A5A;
+    box-shadow: 0 0 0 0 rgba(212, 90, 90, 0.4);
+  }
+  50% {
+    border-color: #E06A6A;
+    box-shadow: 0 0 20px 5px rgba(212, 90, 90, 0.2);
+  }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ambientShift {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes textPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes grow {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.3s ease-out forwards;
+}
+
+.animate-pulse-border {
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+/* Utility classes for dusk theme */
+.animate-fade-up {
+  animation: fadeSlideUp 0.5s ease-out forwards;
+}
+
+.animate-fade-down {
+  animation: fadeSlideDown 0.6s ease-out forwards;
+}
+
+.animate-ambient {
+  animation: ambientShift 12s ease-in-out infinite;
+}
+
+.animate-text-pulse {
+  animation: textPulse 2.5s ease-in-out infinite;
+}
+
+.animate-grow {
+  animation: grow 0.4s ease-out forwards;
+}
+
+/* Glass effect utilities */
+.glass-card {
+  background: var(--card-glass);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-circle {
+  background: var(--card-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Safe area utilities */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Touch feedback */
+.touch-feedback {
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.touch-feedback:active {
+  transform: scale(0.97);
+}
+
+/* Responsive breakpoints for Android */
+@media (max-width: 360px) {
+  .greeting-text {
+    font-size: 26px !important;
+  }
+  
+  .menu-item-card {
+    padding: 14px 16px;
+    min-height: 48px;
+  }
+  
+  .app-container {
+    padding: 16px 12px;
+    padding-bottom: calc(90px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (min-width: 412px) {
+  .menu-item-card {
+    padding: 16px 18px;
+  }
+  
+  .greeting-text {
+    font-size: 30px;
+  }
+}
+
+@media (min-width: 480px) {
+  .app-container {
+    max-width: 460px;
+  }
+}
+
+/* Input styling for dusk theme */
+input, textarea, select {
+  font-family: 'Outfit', sans-serif;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Focus states */
+input:focus,
+textarea:focus,
+button:focus {
+  outline: none;
+}
+
+/* Font family utilities */
+.font-display {
+  font-family: 'Lora', serif;
+}
+
+.font-body {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Scrollable container with bottom padding for SOS */
+.scroll-with-sos {
+  padding-bottom: 90px;
+}
