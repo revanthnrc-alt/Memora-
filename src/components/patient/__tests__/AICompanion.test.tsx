@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import AICompanion from '../AICompanion';
 import { getAICompanionChatResponse } from '../../../services/geminiService';
+import { AppProvider, useAppContext } from '../../../context/AppContext';
 
 const voskSpeechMock = vi.hoisted(() => ({
   isNativePlatform: vi.fn(() => false),
@@ -60,6 +62,27 @@ class MockSpeechRecognition {
 }
 
 describe('AICompanion', () => {
+  const EnableDevMode = () => {
+    const { dispatch } = useAppContext();
+
+    useEffect(() => {
+      dispatch({ type: 'SET_DEV_MODE', payload: true });
+      // AppProvider recreates its wrapped dispatch function on state changes,
+      // so we intentionally run this once for test setup only.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    return null;
+  };
+
+  const renderWithAppProvider = ({ devMode = false }: { devMode?: boolean } = {}) =>
+    render(
+      <AppProvider>
+        {devMode ? <EnableDevMode /> : null}
+        <AICompanion onBack={() => {}} />
+      </AppProvider>
+    );
+
   beforeEach(() => {
     vi.clearAllMocks();
     MockSpeechRecognition.lastInstance = null;
@@ -92,7 +115,7 @@ describe('AICompanion', () => {
   });
 
   it('sends typed message on Enter', async () => {
-    render(<AICompanion onBack={() => {}} />);
+    renderWithAppProvider();
 
     const input = screen.getByPlaceholderText('Type a message...');
     fireEvent.change(input, { target: { value: 'hello there' } });
@@ -106,7 +129,7 @@ describe('AICompanion', () => {
   });
 
   it('captures microphone transcript and sends once when recognition ends', async () => {
-    render(<AICompanion onBack={() => {}} />);
+    renderWithAppProvider();
 
     const micButton = await screen.findByLabelText('Start listening');
     await waitFor(() => {
@@ -134,7 +157,7 @@ describe('AICompanion', () => {
     (window as any).SpeechRecognition = undefined;
     (window as any).webkitSpeechRecognition = undefined;
 
-    render(<AICompanion onBack={() => {}} />);
+    renderWithAppProvider({ devMode: true });
 
     expect(await screen.findByText('Voice mode: Unavailable (text only)')).toBeInTheDocument();
     expect(await screen.findByText(/Voice status: text-only \(speech_api_unavailable\)/)).toBeInTheDocument();
@@ -149,7 +172,7 @@ describe('AICompanion', () => {
     });
     voskSpeechMock.ensurePermission.mockResolvedValue({ granted: true });
 
-    render(<AICompanion onBack={() => {}} />);
+    renderWithAppProvider({ devMode: true });
 
     expect(await screen.findByText(/Voice mode: Native/)).toBeInTheDocument();
     expect(await screen.findByText(/Voice status: native \(ok\)/)).toBeInTheDocument();
@@ -163,7 +186,7 @@ describe('AICompanion', () => {
       modelDownloaded: false,
     });
 
-    render(<AICompanion onBack={() => {}} />);
+    renderWithAppProvider({ devMode: true });
 
     expect(await screen.findByText(/Voice mode: Unavailable/)).toBeInTheDocument();
     expect(await screen.findByText(/Voice status: native \(model_not_downloaded\)/)).toBeInTheDocument();
