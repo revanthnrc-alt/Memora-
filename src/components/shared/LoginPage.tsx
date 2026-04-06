@@ -4,11 +4,19 @@ import realtimeService from '../../services/realtimeService';
 import { useAppContext } from '../../context/AppContext';
 import DashboardSelectorModal from './DashboardSelectorModal';
 
+const getDefaultRealtimeUrl = () => {
+  if (typeof window === 'undefined') return 'ws://localhost:8081';
+
+  const host = window.location.hostname || 'localhost';
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${protocol}//${host}:8081`;
+};
+
 const LoginPage: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
   const { dispatch } = useAppContext();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [wssUrl, setWssUrl] = useState('ws://localhost:8081');
+  const [wssUrl, setWssUrl] = useState(getDefaultRealtimeUrl);
   const [room, setRoom] = useState('demo');
   const [devMode, setDevMode] = useState(false);
 

@@ -12,31 +12,40 @@ export default defineConfig(() => {
   const certPath = path.resolve('./localhost.pem');
   const useMkcert = fs.existsSync(keyPath) && fs.existsSync(certPath);
 
-  // fix: Explicitly type `httpsconfig` with `HttpsServerOptions` to resolve type error.
-  let httpsConfig: HttpsServerOptions;
-
   if (useMkcert) {
     // If files are found, use them for a trusted local HTTPS server (ideal for mobile).
     console.log('✅ Found mkcert certificates. Using them for a trusted HTTPS server.');
-    httpsConfig = {
+    const httpsConfig: HttpsServerOptions = {
       key: fs.readFileSync(keyPath),
       cert: fs.readFileSync(certPath),
       minVersion: 'TLSv1.2',
     };
+
+    return {
+      plugins: [react()],
+      server: {
+        https: httpsConfig,
+        host: true,
+        proxy: {
+          '/api': 'http://localhost:8081',
+        },
+      },
+      build: {
+        rollupOptions: {
+          // Dependencies are now bundled by Vite, so the external option is no longer needed.
+        }
+      }
+    };
   } else {
-    // If not found, fall back to Vite's default self-signed certificate but enforce a secure protocol.
-    console.log('⚠️ Could not find mkcert certificates. Using Vite\'s default certificate for HTTPS.');
-    console.log('   For mobile testing, follow the one-time setup in README.md.');
-    httpsConfig = {
-      minVersion: 'TLSv1.2',
-    }; 
+    // Without mkcert, use plain HTTP locally. This avoids broken TLS handshakes
+    // and keeps the demo websocket on ws://localhost:8081 usable in the browser.
+    console.log('⚠️ Could not find mkcert certificates. Starting the dev server over HTTP.');
+    console.log('   For mobile HTTPS testing, generate localhost.pem and localhost-key.pem as described in README.md.');
   }
 
   return {
     plugins: [react()],
     server: {
-      // Use the determined HTTPS configuration.
-      https: httpsConfig,
       host: true,  // Expose to the network to allow access from mobile devices
       // Local proxy for backend APIs (Gemini proxy, uploads, etc.) when demo-server runs on 8081.
       proxy: {

@@ -5,8 +5,16 @@ import DashboardSelectorModal from './DashboardSelectorModal';
 
 // Simple DemoLogin that also dispatches LOGIN_SUCCESS into AppContext
 
+const getDefaultRealtimeUrl = () => {
+  if (typeof window === 'undefined') return 'ws://localhost:8081';
+
+  const host = window.location.hostname || 'localhost';
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${protocol}//${host}:8081`;
+};
+
 const DemoLogin: React.FC = () => {
-  const [url, setUrl] = useState<string>('ws://localhost:8081');
+  const [url, setUrl] = useState<string>(getDefaultRealtimeUrl);
   const [username, setUsername] = useState<string>('demo');
   const [password, setPassword] = useState<string>('demo');
   const [role, setRole] = useState<string>('FAMILY');
